@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # (c) Copyright 2016 xbgmsharp <xbgmsharp@gmail.com>
@@ -23,13 +23,14 @@ try:
         requests.packages.urllib3.disable_warnings()
         import csv
 except:
-        sys.exit("Please use your favorite mehtod to install the following module requests and simplejson to use this script")
+        sys.exit("Please use your favorite method to install the following module requests and simplejson to use this script")
 
 import argparse
 import ConfigParser
 import datetime
 import collections
 import pprint
+from trakt_credentials import get_trakt_pin
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -152,11 +153,14 @@ def write_csv(options, results):
 
 def api_auth(options):
         """API call for authentification OAUTH"""
-        print("Open the link in a browser and paste the pincode when prompted")
-        print("https://trakt.tv/oauth/authorize?response_type=code&"
-              "client_id={0}&redirect_uri=urn:ietf:wg:oauth:2.0:oob".format(
-                  _trakt["client_id"]))
-        pincode = str(raw_input('Input:'))
+        auth_url = (
+            "https://trakt.tv/oauth/authorize?response_type=code&"
+            "client_id={0}&redirect_uri=urn:ietf:wg:oauth:2.0:oob".format(
+                _trakt["client_id"]))
+        print auth_url
+        pincode = get_trakt_pin(auth_url)
+        assert pincode
+
         url = _trakt['baseurl'] + '/oauth/token'
         values = {
             "code": pincode,
